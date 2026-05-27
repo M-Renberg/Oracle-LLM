@@ -50,3 +50,20 @@ class PromptBuilder(Runable[PromptBuilderInput, LLMRunnerInput]):
         prompt = f"{system}\n\n{stats}\n\nFråga: {data.question}\nSvar:"
         
         return LLMRunnerInput(full_prompt=prompt)
+    
+
+class ResponseParser(Runable[LLMRunnerOutput, AskResponse]):
+    name: str = "response_parser"
+    
+    def invoke(self, data: LLMRunnerOutput) -> AskResponse:
+        raw = data.raw_text
+        if "Svar:" in raw:
+            answer = raw.split("Svar:")[-1].strip()
+        else:
+            answer = raw.strip()
+            
+        return AskResponse(
+            question="[Frågan hämtas från tidigare steg]",
+            answer=answer,
+            model="HuggingFaceTB/SmolLM2-135M-Instruct"
+        )
