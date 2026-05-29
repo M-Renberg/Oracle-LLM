@@ -8,3 +8,6 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Slime Helper Notes
+slime_notes.md

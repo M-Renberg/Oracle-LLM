@@ -21,8 +21,8 @@ class LLMRunner(Runable[LLMRunnerInput, LLMRunnerOutput]):
         self._generator = pipeline(
             "text-generation",
             model="HuggingFaceTB/SmolLM2-135M-Instruct",
-            device_map="auto",
-            torch_dtype=torch.float32
+            device="cpu",
+            dtype=torch.float32
         )
 
     def invoke(self, data: LLMRunnerInput) -> LLMRunnerOutput:

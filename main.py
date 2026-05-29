@@ -6,6 +6,10 @@ from schemas import AskRequest, AskResponse, UploadMetadataResponse
 
 app = FastAPI()
 
+@app.get("/")
+async def root():
+    return {"message": "Oraklet-API är igång! Gå till /docs för att testa endpoints."}
+
 @app.post("/data/upload")
 async def upload_data(file: UploadFile):
     if not file.filename.endswith('.csv'):
