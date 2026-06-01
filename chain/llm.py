@@ -27,7 +27,7 @@ class DataSelector(Runable[PromptBuilderInput, LLMRunnerInput]):
         
         result= LLMRunnerInput(full_prompt=prompt)
         print(f"DEBUG: DataSelector returnerar: {type(result)}")
-        return LLMRunnerInput(full_prompt=prompt)
+        return LLMRunnerInput(full_prompt=prompt, original_question= data.question)
 
 class AnalysisStep(Runable[LLMRunnerOutput, LLMRunnerInput]):
     def invoke(self, data: LLMRunnerOutput) -> LLMRunnerInput:
@@ -35,7 +35,7 @@ class AnalysisStep(Runable[LLMRunnerOutput, LLMRunnerInput]):
         prompt = f"{system}\n\nRelevant Data: {data.raw_text}\n\nQuestion: {data.original_question}\nAnswer:"
         result = LLMRunnerInput(full_prompt=prompt)
         print(f"DEBUG: AnalysisStep returnerar: {type(result)}")
-        return LLMRunnerInput(full_prompt=prompt)
+        return LLMRunnerInput(full_prompt=prompt, original_question=data.original_question)
 
 
 class LLMRunner(Runable[LLMRunnerInput, LLMRunnerOutput]):
@@ -72,20 +72,20 @@ class LLMRunner(Runable[LLMRunnerInput, LLMRunnerOutput]):
 
 
 
-class PromptBuilder(Runable[PromptBuilderInput, LLMRunnerInput]):
-    name: str = "prompt_builder"
+# class PromptBuilder(Runable[PromptBuilderInput, LLMRunnerInput]):
+#     name: str = "prompt_builder"
     
-    def invoke(self, data: PromptBuilderInput) -> LLMRunnerInput:
-        #csv_reducer = {k: {sk: v for sk, v in sv.items() if sk in ['max', 'mean']} for k, sv in data.context_stats.items()}
-        head_data = data.context_stats.get('head', [])
-        system = "You're an expert data analysis. You only give short answers."
-        table_str = str(head_data)
-        #stats = f"Statistik: {data.context_stats}"
-        #prompt = f"{system}\n\nData: {csv_reducer}\n\nFråga: {data.question}\nSvar:"        
-        prompt = f"{system}\n\ndata: {table_str}\n\nquestion: {data.question}\nanswer:"
-        result = LLMRunnerInput(full_prompt=prompt)
-        print(f"DEBUG: promptbuilder returnerar: {type(result)}")
-        return LLMRunnerInput(full_prompt=prompt)
+#     def invoke(self, data: PromptBuilderInput) -> LLMRunnerInput:
+#         #csv_reducer = {k: {sk: v for sk, v in sv.items() if sk in ['max', 'mean']} for k, sv in data.context_stats.items()}
+#         head_data = data.context_stats.get('head', [])
+#         system = "You're an expert data analysis. You only give short answers."
+#         table_str = str(head_data)
+#         #stats = f"Statistik: {data.context_stats}"
+#         #prompt = f"{system}\n\nData: {csv_reducer}\n\nFråga: {data.question}\nSvar:"        
+#         prompt = f"{system}\n\ndata: {table_str}\n\nquestion: {data.question}\nanswer:"
+#         result = LLMRunnerInput(full_prompt=prompt)
+#         print(f"DEBUG: promptbuilder returnerar: {type(result)}")
+#         return LLMRunnerInput(full_prompt=prompt)
     
 
 class ResponseParser(Runable[LLMRunnerOutput, AskResponse]):
@@ -101,7 +101,7 @@ class ResponseParser(Runable[LLMRunnerOutput, AskResponse]):
         answer = answer.split("Data:")[0].split("Question:")[0].strip()
             
         return AskResponse(
-            question="[Frågan hämtas från tidigare steg]",
+            question=data.original_question,
             answer=answer,
             model="HuggingFaceTB/SmolLM2-1.7B-Instruct"
         )

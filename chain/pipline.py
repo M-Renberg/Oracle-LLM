@@ -1,7 +1,7 @@
-from chain.llm import PromptBuilder, LLMRunner, ResponseParser, PromptBuilderInput, AnalysisStep, DataSelector
+from chain.llm import LLMRunner, ResponseParser, PromptBuilderInput, AnalysisStep, DataSelector
 from schemas import AskResponse
 
-prompt_builder = PromptBuilder()
+#prompt_builder = PromptBuilder()
 data_selector = DataSelector()
 llm_runner = LLMRunner()
 analysis_step = AnalysisStep()
@@ -14,6 +14,6 @@ oraklet = (
 )
 def run_oracle(question: str, stats: dict) -> AskResponse:
     input_data = PromptBuilderInput(question=question, context_stats=stats)
-    raw_result = oraklet.invoke(input_data)
-    raw_result.question = question
-    return raw_result
+    result = oraklet.invoke(input_data)
+    #raw_result.question = question
+    return result

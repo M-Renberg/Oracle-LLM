@@ -36,7 +36,7 @@ uv add fastapi uvicorn transformers torch pandas pydantic
 ## Running the API
 
 ```bash
-uvicorn main:app --reload --port 8001
+uv run uvicorn main:app --reload --port 8001
 ```
 
 The API will be available at `http://127.0.0.1:8001`. Interactive docs at `/docs`.
