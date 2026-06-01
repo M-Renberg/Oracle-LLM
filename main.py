@@ -26,9 +26,12 @@ async def upload_data(file: UploadFile):
 
 @app.post("/ai/ask")
 async def ask_question(request: AskRequest):
-    stats = get_stats() 
+    stats = get_stats()
+    df = get_dataframe()
+    
+    context = {"summary": stats, "head": df.head(5)} 
     
     try:
-        return run_oracle(request.question, stats)
+        return run_oracle(request.question, context)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

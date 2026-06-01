@@ -9,4 +9,6 @@ oraklet = prompt_builder | llm_runner | response_parser
 
 def run_oracle(question: str, stats: dict) -> AskResponse:
     input_data = PromptBuilderInput(question=question, context_stats=stats)
-    return oraklet.invoke(input_data)
+    raw_result = oraklet.invoke(input_data)
+    raw_result.question = question
+    return raw_result
