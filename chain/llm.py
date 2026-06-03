@@ -7,6 +7,7 @@ from typing import Any
 from schemas import AskResponse
 import anthropic
 from dotenv import load_dotenv
+import pandas as pd
 
 load_dotenv()
 
@@ -67,6 +68,20 @@ class AnalysisStep(Runable[LLMRunnerOutput, LLMRunnerInput]):
         result = LLMRunnerInput(full_prompt=prompt, original_question=data.original_question, model_key=data.model_key)
         print(f"DEBUG: AnalysisStep returnerar: {type(result)}")
         return result
+    
+class DirectPromptBuilder(Runable[PromptBuilderInput, LLMRunnerInput]):
+    name: str = "direct_prompt_builder"
+
+    def invoke(self, data: PromptBuilderInput) -> LLMRunnerInput:
+        head_data = data.context_stats.get('head', [])
+        table_str = data.context_stats.get('head', '')
+        
+        prompt = f"You are a data analyst. Answer the question based on the data below.\n\nData:\n{table_str}\n\nQuestion: {data.question}\nAnswer:"
+        return LLMRunnerInput(
+            full_prompt=prompt,
+            original_question=data.question,
+            model_key=data.model_key,
+        )
 
 
 class LLMRunner(Runable[LLMRunnerInput, LLMRunnerOutput]):
