@@ -12,8 +12,7 @@ oraklet = (
     analysis_step | llm_runner | 
     response_parser
 )
-def run_oracle(question: str, stats: dict) -> AskResponse:
-    input_data = PromptBuilderInput(question=question, context_stats=stats)
-    result = oraklet.invoke(input_data)
-    #raw_result.question = question
-    return result
+
+def run_oracle(question: str, stats: dict, model: str = "smollm2") -> AskResponse:
+    input_data = PromptBuilderInput(question=question, context_stats=stats, model_key=model)
+    return oraklet.invoke(input_data)

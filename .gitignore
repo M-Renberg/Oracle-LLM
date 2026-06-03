@@ -11,3 +11,8 @@ wheels/
 
 # Slime Helper Notes
 slime_notes.md
+
+#environments
+.env
+*.env
+

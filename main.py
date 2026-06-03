@@ -3,12 +3,19 @@ from fastapi import FastAPI, UploadFile, HTTPException
 from datahandler import load_csv_to_memory, get_dataframe, get_stats
 from chain.pipline import run_oracle
 from schemas import AskRequest, AskResponse, UploadMetadataResponse
+import pandas as pd
+from chain.llm import MODELS
 
 app = FastAPI()
 
 @app.get("/")
 async def root():
     return {"message": "Oraklet-API är igång! Gå till /docs för att testa endpoints."}
+
+@app.get("/ai/models")
+async def list_models():
+    return {"available_models": list(MODELS.keys())}
+
 
 @app.post("/data/upload")
 async def upload_data(file: UploadFile):
@@ -25,13 +32,17 @@ async def upload_data(file: UploadFile):
     }
 
 @app.post("/ai/ask")
-async def ask_question(request: AskRequest):
+async def ask_question(request: AskRequest, model: str = "smollm2"):
+    if model not in MODELS:
+        raise HTTPException(status_code=400, detail=f"Okänd modell '{model}'. Tillgängliga: {list(MODELS.keys())}")
+ 
     stats = get_stats()
     df = get_dataframe()
-    
-    context = {"summary": stats, "head": df.head(5)} 
-    
+ 
+ 
+    context = {"summary": stats, "head": df}
+ 
     try:
-        return run_oracle(request.question, context)
+        return run_oracle(request.question, context, model=model)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
